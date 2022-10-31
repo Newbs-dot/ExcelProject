@@ -5,7 +5,7 @@ app = FastAPI(
     openapi_url=f'/v1/openapi.json',
 )
 
-
+ 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
