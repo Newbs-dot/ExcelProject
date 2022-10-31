@@ -1,0 +1,7 @@
+dotenv
+pydantic
+os
+uvicorn
+fastapi
+telethon
+httpx
