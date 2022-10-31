@@ -13,7 +13,7 @@
 1) установить все неустановленные пакеты проекта + uvicorn
 
 2) в папку settings нужно положить этот
-   файл( https://urfume-my.sharepoint.com/:u:/g/personal/makar_batuev_urfu_me/EZLOlezmttRPvPjFwqfJKa0BG6glM2PVeojOXZ06GSinHw?e=sUVEX3 )
+   файл( https://urfume-my.sharepoint.com/:u:/g/personal/makar_batuev_urfu_me/EWa1Bta3vExMp_SKy8wrbUwBdLajZXIIkP2Iy1VGWfydkQ?e=BevCu5 )
 
 3) потом в мейне сендера запустить приложение
 
