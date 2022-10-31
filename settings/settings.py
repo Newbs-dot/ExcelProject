@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     API_ROOT_URL: str = os.getenv('API_ROOT_URL')
     API_SECRET_KEY: str = os.getenv('API_SECRET_KEY')
     API_PROJECT_NAME: str = os.getenv('API_PROJECT_NAME')
-    API_VERSION: str = os.getenv('API_VERSION')
+    API_PREFIX: str = os.getenv('API_PREFIX')
 
     class Config:
         case_sensitive = True
