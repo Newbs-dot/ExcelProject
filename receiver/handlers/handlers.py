@@ -32,7 +32,7 @@ async def upload_files_handler(message: types.Message, files: List[types.Message
 
 
 async def select_filters_handler(message: types.Message, state: FSMContext):
-    if filter_helper.can_change_state(state, message.text):
+    if await filter_helper.can_change_state(state, message.text):
         await message.answer('Введите ссылку на Google Диск с итоговым файлом', reply_markup=types.ReplyKeyboardRemove())
         await BotState.send_google_url.set()
         return

@@ -32,8 +32,10 @@ class FilterHelper:
         return types.ReplyKeyboardMarkup(keyboard=buttons)
 
     @classmethod
-    def can_change_state(cls, selected_filter_list: List[str], message_text: str):
-        return cls._end_button_text in message_text and len(selected_filter_list) > 0
+    async def can_change_state(cls, state: FSMContext, message_text: str):
+        data = await state.get_data()
+
+        return cls._end_button_text in message_text and 'filters' in data and len(data['filters']) > 0
 
 
 filter_helper = FilterHelper()
