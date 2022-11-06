@@ -8,18 +8,12 @@ class FilterHelper:
     _end_button_text: str = 'Закончить выбор фильтров'
 
     @classmethod
-    async def get_filter_data(cls, state: FSMContext):
+    async def add_filter_to_state(cls, state: FSMContext, filter_text: str):
         data = await state.get_data()
 
         if 'filters' not in data:
             data['filters'] = []
-            await state.update_data(data=data)
 
-        return data
-
-    @classmethod
-    async def add_filter_to_state(cls, state: FSMContext, filter_text: str):
-        data = await state.get_data()
         data['filters'].append(filter_text)
         await state.update_data(data=data)
 
