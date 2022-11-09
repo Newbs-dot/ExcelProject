@@ -1,9 +1,9 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from api_driver import api_driver
 from bot import BotState
 from utils import filter_helper, file_helper
-from api_driver import api_driver
 
 
 async def start_handler(message: types.Message, state: FSMContext) -> None:
@@ -18,8 +18,9 @@ async def end_handler(message: types.Message, state: FSMContext) -> None:
 
 async def upload_files_handler(message: types.Message, files: list[types.Message], state: FSMContext) -> None:
     if not file_helper.is_files_type_correct(files):
-        await message.answer(f'Тип файлов некорректный\nПожалуйста загрузите файлы в одном из этих форматов {file_helper.allowed_file_types}',
-                             reply_markup=types.ReplyKeyboardRemove())
+        await message.answer(
+            f'Тип файлов некорректный\nПожалуйста загрузите файлы в одном из этих форматов {file_helper.allowed_file_types}',
+            reply_markup=types.ReplyKeyboardRemove())
         return
 
     await file_helper.set_files_state(files, state)
@@ -31,7 +32,8 @@ async def upload_files_handler(message: types.Message, files: list[types.Message
 
 async def select_filters_handler(message: types.Message, state: FSMContext) -> None:
     if await filter_helper.can_change_state(state, message.text):
-        await message.answer('Введите ссылку на Google Диск с итоговым файлом', reply_markup=types.ReplyKeyboardRemove())
+        await message.answer('Введите ссылку на Google Диск с итоговым файлом',
+                             reply_markup=types.ReplyKeyboardRemove())
         await BotState.send_google_url.set()
         return
 
@@ -46,6 +48,7 @@ async def send_google_url_handler(message: types.Message, state: FSMContext) -> 
     url = message.values.get('text')
     filters = data['filters']
     files = data['files']
+    await message.answer('бот начал работу')
     resp = await api_driver.write_data_by_url(files=files, filters=filters, google_doc_url=url)
-    await message.answer(resp)
+    await message.answer('результат записан в файл')
     await state.finish()

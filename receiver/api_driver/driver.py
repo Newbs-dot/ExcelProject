@@ -10,11 +10,14 @@ class GatewayAPIDriver:
     @classmethod
     async def write_data_by_url(cls, files: list[bytes], filters: list[str], google_doc_url: str) -> httpx.Response:
         data = {'google_doc_url': google_doc_url, 'filters': filters, 'files': files}
-        async with httpx.AsyncClient() as client:
-            resp = await client.post(
-                f'{cls.Route.API_GOOGLE_DOC}/write',
-                data=data,
-            )
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.post(
+                    f'{cls.Route.API_GOOGLE_DOC}/write',
+                    data=data,
+                )
+        except Exception as i:
+            return i
 
         return resp
 
