@@ -1,13 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, status
+from models import DocumentWriteRequest
 
 router = APIRouter()
 
 
-@router.post("/google_doc/check")
-def check_url(url):
-    return {"Hello": "World"}
-
-
-@router.post("/google_doc/write")
-def write_data():
-    return {"Hello": "World"}
+@router.post('/googleDoc/write', status_code=status.HTTP_200_OK)
+async def write_data_by_url(write_request_model: DocumentWriteRequest) -> None:
+    print(write_request_model)
+    return
