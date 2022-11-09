@@ -11,7 +11,7 @@ class FilesMiddleware(BaseMiddleware):
     _latency: Union[int, float] = 0.01
 
     # сбор файлов в одну группу
-    async def on_process_message(self, message: types.Message, data: dict):
+    async def on_process_message(self, message: types.Message, data: dict) -> None:
         try:
             self._files_storage[message.media_group_id].append(message)
             raise CancelHandler()  # Tell aiogram to cancel handler for this group element
@@ -21,7 +21,7 @@ class FilesMiddleware(BaseMiddleware):
             data['files'] = self._files_storage[message.media_group_id]
 
     # очистка хранилища файлов
-    async def on_post_process_message(self, message: types.Message, result: dict, data: dict):
+    async def on_post_process_message(self, message: types.Message, result: dict, data: dict) -> None:
         if 'files' in data and len(data['files']) != 0:
             del self._files_storage[message.media_group_id]
 
