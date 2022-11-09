@@ -16,7 +16,7 @@ async def get_data_from_file(file):
     org_table['Name'] = org_table.apply(lambda row:format_fio(row['Name']),axis = 1)
 
     #org_table.to_dict('split')
-
+    #1
 
     return org_table
 
