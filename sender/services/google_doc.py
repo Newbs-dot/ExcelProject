@@ -1,4 +1,3 @@
-import google.auth
 import gspread
 import pandas as pd
 from fuzzywuzzy import fuzz
