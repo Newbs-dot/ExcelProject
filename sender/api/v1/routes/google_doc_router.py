@@ -6,7 +6,7 @@ router = APIRouter()
 file = 'D:\Code\PythonExcelBot\Orgs\Org1.xlsx'
 
 
-@router.post('/googleDoc/write', status_code=status.HTTP_200_OK)
+@router.post('/write', status_code=status.HTTP_200_OK)
 async def write_data(request: Request) -> None:
     data = await get_data_from_file(file)
     await write_data_by_url(
