@@ -11,7 +11,7 @@
 # Инструкция по запуску проекта (для разработчиков)
 
 1) в папку settings нужно положить этот
-   файл( https://urfume-my.sharepoint.com/:u:/g/personal/makar_batuev_urfu_me/EWa1Bta3vExMp_SKy8wrbUwBdLajZXIIkP2Iy1VGWfydkQ?e=BevCu5 )
+   файл( https://urfume-my.sharepoint.com/:u:/g/personal/makar_batuev_urfu_me/Edo37gyjdYNMowEMq86-7owBLF4jZFA6r66ZeALrunTiPg?e=Fe2RYL )
 
 2) потом в мейне сендера запустить приложение
 
