@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     API_SECRET_KEY: str = os.getenv('API_SECRET_KEY')
     API_PROJECT_NAME: str = os.getenv('API_PROJECT_NAME')
     API_PREFIX: str = os.getenv('API_PREFIX')
+    API_DATABASE_URL: str = os.getenv('API_DATABASE_URL')
 
     class Config:
         case_sensitive = True
