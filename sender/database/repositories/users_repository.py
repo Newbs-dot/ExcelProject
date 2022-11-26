@@ -1,20 +1,36 @@
+from typing import Optional
+
 from sqlalchemy.orm import Session
 
-from models import UserCheck, UserUpdateRole, User, UserCreate, role
-from .base_repository import BaseRepository
+from models import User, UserCreate, role
 from ..orms import UserOrm
 
 
-class UsersRepository(BaseRepository):
-
-    def is_user_exist(self, db: Session, check_user: UserCheck) -> bool:
-        user = db.query(UserOrm).filter(UserOrm.telegram_id.contains(check_user.telegram_id)).first()
+class UsersRepository:
+    @classmethod
+    def get_user_by_id(cls, db: Session, telegram_id: str) -> Optional[User]:
+        item = db.query(UserOrm).filter(UserOrm.telegram_id == telegram_id).first()
         db.close()
 
-        return user is not None
+        return item
 
-    def create_user(self, db: Session, user_create: UserCreate) -> User | None:
-        if self.is_user_exist(db, UserCheck(telegram_id=user_create.telegram_id)):
+    @classmethod
+    def get_users(cls, db: Session) -> list[User]:
+        items = db.query(UserOrm).all()
+        db.close()
+
+        return items
+
+    @classmethod
+    def delete_user_by_id(cls, db: Session, telegram_id: str) -> None:
+        obj = db.query(UserOrm).get(telegram_id)
+        db.delete(obj)
+        db.commit()
+        db.close()
+
+    @classmethod
+    def create_user(cls, db: Session, user_create: UserCreate) -> User | None:
+        if cls.get_user_by_id(db, user_create.telegram_id):
             return None
 
         user = UserOrm(telegram_id=user_create.telegram_id, role=role.User)
@@ -25,16 +41,14 @@ class UsersRepository(BaseRepository):
 
         return user
 
-    def update_user_role(self, db: Session, id: int, update_user: UserUpdateRole) -> User | None:
-        user = self.get_by_id(db, id)
+    @classmethod
+    def update_user_role(cls, db: Session, telegram_id: str, role: str) -> User | None:
+        user = db.query(UserOrm).filter(UserOrm.telegram_id == telegram_id).update({'role': role})
 
-        if user is None:
-            return user
-
-        user.role = update_user.role
         db.commit()
-        db.refresh(user)
         db.close()
 
+        return user
 
-users_repository = UsersRepository(UserOrm)
+
+users_repository = UsersRepository()
