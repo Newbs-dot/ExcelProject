@@ -1,7 +1,7 @@
 import unittest
 
 from models import Filter
-from services import filter_service
+from services.filters import filter_service
 
 
 def create_filters_from_name(names: list[str]) -> list[Filter]:
