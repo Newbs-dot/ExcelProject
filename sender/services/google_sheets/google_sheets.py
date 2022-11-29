@@ -1,6 +1,10 @@
 import apiclient
+import gspread
 import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
+
+from services.files import file_service
+#.files import tables_in_bytes
 
 
 class GoogleSheetService:
@@ -33,20 +37,25 @@ class GoogleSheetService:
             majorDimension='COLUMNS'
         ).execute()
 
+    def gspread_read(cls,url,month):
+        account_credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            cls._credentials_file_name,
+            ['https://www.googleapis.com/auth/spreadsheets',
+             'https://www.googleapis.com/auth/drive'])
+        client = gspread.authorize(account_credentials)
+        sheet = client.open_by_url(url)
+        ws = sheet.worksheet(month)
+        data = ws.get_values('A:H')
+        return data
+
     def write_by_file_id(self, file_id: str, body: dict[str, str]) -> None:
         write_file = self._service.spreadsheets().values().batchUpdate(
             spreadsheetId=file_id,
-            body={
-                "valueInputOption": "USER_ENTERED",
-                "data": [
-                    {"range": "B3:C4",
-                     "majorDimension": "ROWS",
-                     "values": [["This is B3", "This is C3"], ["This is B4", "This is C4"]]},
-                    {"range": "D5:E6",
-                     "majorDimension": "COLUMNS",
-                     "values": [["This is D5", "This is D6"], ["This is E5", "=5+5"]]}
-                ]
-            }
+            body=file_service.make_body(
+                'https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154',
+                'январь',
+                file_service.get_data_from_file(tables_in_bytes[0]),
+                ['Болезнь', 'Отпуск'])
         ).execute()
 
 
