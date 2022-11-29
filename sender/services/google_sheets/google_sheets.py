@@ -1,27 +1,14 @@
-import apiclient
 import gspread
-import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
 
 from services.files import file_service
-#.files import tables_in_bytes
+
+
+# .files import tables_in_bytes
 
 
 class GoogleSheetService:
     _credentials_file_name = 'creds.json'
-
-    def __int__(self):
-        self._service = self._get_auth_service()
-
-    @classmethod
-    def _get_auth_service(cls):
-        account_credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            cls._credentials_file_name,
-            ['https://www.googleapis.com/auth/spreadsheets',
-             'https://www.googleapis.com/auth/drive'])
-        http_auth = account_credentials.authorize(httplib2.Http())
-
-        return apiclient.discovery.build('sheets', 'v4', http=http_auth)
 
     @classmethod
     def get_file_id_by_url(cls, url: str) -> str | None:
@@ -37,7 +24,7 @@ class GoogleSheetService:
             majorDimension='COLUMNS'
         ).execute()
 
-    def gspread_read(cls,url,month):
+    def gspread_read(cls, url, month):
         account_credentials = ServiceAccountCredentials.from_json_keyfile_name(
             cls._credentials_file_name,
             ['https://www.googleapis.com/auth/spreadsheets',
