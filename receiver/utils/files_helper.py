@@ -21,7 +21,7 @@ class FileHelper:
             downloaded_file = await bot.download_file_by_id(file[file.content_type].file_id)
             bytes_io = BytesIO()
             bytes_io.write(downloaded_file.getvalue())
-            res.append(bytes_io.getvalue())
+            res.append(str(bytes_io.getvalue()))
 
         data = await state.get_data()
         data['files'] = res

@@ -14,4 +14,4 @@ class GoogleSheetsFilterItem(GoogleSheets):
 class GoogleSheetsUpdateTable(GoogleSheets):
     url: str
     filters: list[GoogleSheetsFilterItem]
-    files: list[bytes]
+    files: list[str]
