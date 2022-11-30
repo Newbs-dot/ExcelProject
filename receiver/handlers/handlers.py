@@ -1,7 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from api_driver import api_driver
 from bot import BotState
 from utils import filter_helper, file_helper
 
@@ -49,6 +48,5 @@ async def send_google_url_handler(message: types.Message, state: FSMContext) -> 
     filters = data['filters']
     files = data['files']
     await message.answer('бот начал работу')
-    resp = await api_driver.write_data_by_url(files=files, filters=filters, google_doc_url=url)
     await message.answer('результат записан в файл')
     await state.finish()

@@ -1,6 +1,6 @@
 import unittest
 
-from models import Filter
+from sender.models import Filter
 from services.filters import filter_service
 
 

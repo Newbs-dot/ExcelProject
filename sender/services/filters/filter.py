@@ -1,5 +1,4 @@
-from models import Filter
-from models import filter_type, GoogleSheetsFilterItem
+from sender.models import filter_type, GoogleSheetsFilterItem, Filter
 
 
 class FilterService:

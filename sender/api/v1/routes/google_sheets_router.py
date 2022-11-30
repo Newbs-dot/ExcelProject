@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from models import GoogleSheetsUpdateTable
+from sender.models import GoogleSheetsUpdateTable
 from services import filter_service, google_sheets_service
 
 router = APIRouter()

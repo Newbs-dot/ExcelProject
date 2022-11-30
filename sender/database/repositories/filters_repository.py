@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from models import FilterCreate, Filter
+from sender.models import FilterCreate, Filter
 from services import filter_service
 from ..orms import FilterOrm
 
