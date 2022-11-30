@@ -8,6 +8,7 @@ from utils import filter_helper, file_helper, get_months_buttons, get_month_by_k
 
 
 async def start_handler(message: types.Message, state: FSMContext) -> None:
+    filter_helper.all_filter_list = None
     await message.answer('производится регистрация пользователя', reply_markup=types.ReplyKeyboardRemove())
     telegram_id = message.from_user.id
     await users_driver.create_user(telegram_id)
@@ -17,6 +18,7 @@ async def start_handler(message: types.Message, state: FSMContext) -> None:
 
 
 async def table_handler(message: types.Message, state: FSMContext) -> None:
+    filter_helper.all_filter_list = None
     await message.answer('производится авторизация пользователя', reply_markup=types.ReplyKeyboardRemove())
     telegram_id = message.from_user.id
     users = await users_driver.get_user(telegram_id)
