@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
-from sender.models import GoogleSheetsUpdateTable
-from services import filter_service, google_sheets_service
+from sender.models import GoogleSheetsUpdateTable, SuccessResponse
+from services import filter_service, google_sheets_service, write_by_file_url
 
 router = APIRouter()
 
@@ -14,4 +14,6 @@ async def update_table(update_table_schema: GoogleSheetsUpdateTable):
     if file_id is None:
         raise HTTPException(status_code=402, detail='Invalid google table url')
 
-    return {"Uploaded Files:": "asasdas"}
+    write_by_file_url(update_table_schema.url, update_table_schema.files, update_table_schema.filters, 'январь')
+
+    return SuccessResponse()

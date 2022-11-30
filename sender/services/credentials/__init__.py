@@ -1,1 +1,1 @@
-from .credentials import credentials_service
+from .credentials import gspread_read

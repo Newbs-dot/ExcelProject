@@ -1,3 +1,4 @@
+import base64
 from io import BytesIO
 
 from aiogram import types
@@ -21,7 +22,8 @@ class FileHelper:
             downloaded_file = await bot.download_file_by_id(file[file.content_type].file_id)
             bytes_io = BytesIO()
             bytes_io.write(downloaded_file.getvalue())
-            res.append(str(bytes_io.getvalue()))
+            encoded = base64.b64encode(bytes_io.getvalue())
+            res.append(encoded.decode('ascii'))
 
         data = await state.get_data()
         data['files'] = res

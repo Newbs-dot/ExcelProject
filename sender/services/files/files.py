@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 from fuzzywuzzy import fuzz
 
-from models.schemas.google_sheets import GoogleSheetsFilterItem
+from sender.models.schemas.google_sheets import GoogleSheetsFilterItem
 
 
 class FileService:
 
-    def format_fio(self,fio):
+    def format_fio(self, fio):
         return fio.split()[0] + fio.split()[1]
 
     def get_data_from_file(self, file):
@@ -17,7 +17,7 @@ class FileService:
         org_table['Name'] = org_table.apply(lambda row: self.format_fio(row['Name']), axis=1)
         return org_table
 
-    def find_active_filters(self, filters:list[GoogleSheetsFilterItem]):
+    def find_active_filters(self, filters: list[GoogleSheetsFilterItem]):
         active_filters = []
         for filter in filters:
             if filter.type == 'Selected':
@@ -35,8 +35,8 @@ class FileService:
         doc_range.append(last_entry)
         return doc_range
 
-    def find_filters_cols(self,google_doc,filters):
-        #google_doc = credentials_service.gspread_read(url, worksheet_name)
+    def find_filters_cols(self, google_doc, filters):
+        # google_doc = credentials_service.gspread_read(url, worksheet_name)
         data = google_doc.get_values('A:H')
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
 
@@ -49,20 +49,20 @@ class FileService:
                 if fuzz.partial_ratio(filter, str(ws_head[i][0])) > 40:
                     cells.append(str(ws_head.columns.get_loc(i)))
 
-        #filters_df = pd.DataFrame(cells, active_filters, columns=['Column'])
-        filters_dict = dict(zip(active_filters,cells))
+        # filters_df = pd.DataFrame(cells, active_filters, columns=['Column'])
+        filters_dict = dict(zip(active_filters, cells))
 
         return filters_dict
 
     def count_days(self, google_doc, org_data, filters):
-        #google_doc = credentials_service.gspread_read(url, worksheet_name)
+        # google_doc = credentials_service.gspread_read(url, worksheet_name)
         data = google_doc.get_values('A:H')
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
         ws_df.drop([0, 1], inplace=True)
         ws_df.drop(columns=['A'], inplace=True)
 
         absent_data = {}
-        result_values = np.zeros((len(filters), ws_df.shape[0] + 2)) #тк удалены 2 строки
+        result_values = np.zeros((len(filters), ws_df.shape[0] + 2))  # тк удалены 2 строки
 
         for filter in filters:
             absent_data[filter] = {}
@@ -91,9 +91,6 @@ class FileService:
                 result_values[res_row][k[i] - 1] = v[i]
 
         return result_values
-
-
-
 
 
 file_service = FileService()
