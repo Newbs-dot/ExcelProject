@@ -1,10 +1,11 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
+import services
 from services.files import file_service
+from services.credentials import credentials_service
 
-
-# .files import tables_in_bytes
+from tests.files import tables_in_bytes
 
 
 class GoogleSheetService:
@@ -17,33 +18,9 @@ class GoogleSheetService:
         except Exception:
             return None
 
-    def read_by_id(self, file_id: str) -> None:
-        read_file = self._service.spreadsheets().values().get(
-            spreadsheetId=file_id,
-            range='A1:E10',
-            majorDimension='COLUMNS'
-        ).execute()
-
-    def gspread_read(cls, url, month):
-        account_credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            cls._credentials_file_name,
-            ['https://www.googleapis.com/auth/spreadsheets',
-             'https://www.googleapis.com/auth/drive'])
-        client = gspread.authorize(account_credentials)
-        sheet = client.open_by_url(url)
-        ws = sheet.worksheet(month)
-        data = ws.get_values('A:H')
-        return data
-
-    def write_by_file_id(self, file_id: str, body: dict[str, str]) -> None:
-        write_file = self._service.spreadsheets().values().batchUpdate(
-            spreadsheetId=file_id,
-            body=file_service.make_body(
-                'https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154',
-                'январь',
-                file_service.get_data_from_file(tables_in_bytes[0]),
-                ['Болезнь', 'Отпуск'])
-        ).execute()
-
+    def write_by_file_url(self, url: str,month: str) -> None:
+        #res_doc = credentials_service.gspread_read(self.get_file_id_by_url(url),month)
+        #res_doc.update('filters_range', [[1, 2], [3, 4]])
+        pass
 
 google_sheets_service = GoogleSheetService()

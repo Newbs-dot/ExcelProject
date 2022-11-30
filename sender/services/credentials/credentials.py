@@ -13,8 +13,9 @@ class Credentials:
         client = gspread.authorize(account_credentials)
         sheet = client.open_by_url(url)
         ws = sheet.worksheet(month)
-        data = ws.get_values('A:H')
-        return data
+
+        return ws
+
 
 
 credentials_service = Credentials()

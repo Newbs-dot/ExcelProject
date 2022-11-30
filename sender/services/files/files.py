@@ -2,31 +2,67 @@ import numpy as np
 import pandas as pd
 from fuzzywuzzy import fuzz
 
-from services.credentials import credentials_service
+from models.schemas.google_sheets import GoogleSheetsFilterItem
 
 
 class FileService:
 
-    def format_fio(fio):
+    def format_fio(self,fio):
         return fio.split()[0] + fio.split()[1]
 
     def get_data_from_file(self, file):
         org_table = pd.read_excel(file, skiprows=6, usecols=range(0, 6), header=None,
                                   names=['Name', 'Nan', 'Vac_type', 'Nan1', 'Work_days', 'Vac_days'])
         org_table.dropna(axis='columns', inplace=True)
-        org_table['Name'] = org_table.apply(lambda row: FileService.format_fio(row['Name']), axis=1)  # ?????
-
+        org_table['Name'] = org_table.apply(lambda row: self.format_fio(row['Name']), axis=1)
         return org_table
 
-    def make_body(self, url, worksheet_name, org_data, filters):
-        google_doc = credentials_service.gspread_read(url, worksheet_name)
+    def find_active_filters(self, filters:list[GoogleSheetsFilterItem]):
+        active_filters = []
+        for filter in filters:
+            if filter.type == 'Selected':
+                active_filters.append(filter.name)
 
-        ws_df = pd.DataFrame(google_doc, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
+        return active_filters
+
+    def find_doc_range(self, google_doc):
+        data = google_doc.get_values('A:H')
+        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
+        first_entry = int(ws_df[ws_df['A'] == '1'].index[0])
+        last_entry = int(ws_df.shape[0])
+        doc_range = []
+        doc_range.append(first_entry)
+        doc_range.append(last_entry)
+        return doc_range
+
+    def find_filters_cols(self,google_doc,filters):
+        #google_doc = credentials_service.gspread_read(url, worksheet_name)
+        data = google_doc.get_values('A:H')
+        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
+
+        ws_head = ws_df[:1]
+        cells = []
+        active_filters = self.find_active_filters(filters)
+
+        for i in ws_head:
+            for filter in active_filters:
+                if fuzz.partial_ratio(filter, str(ws_head[i][0])) > 40:
+                    cells.append(str(ws_head.columns.get_loc(i)))
+
+        #filters_df = pd.DataFrame(cells, active_filters, columns=['Column'])
+        filters_dict = dict(zip(active_filters,cells))
+
+        return filters_dict
+
+    def count_days(self, google_doc, org_data, filters):
+        #google_doc = credentials_service.gspread_read(url, worksheet_name)
+        data = google_doc.get_values('A:H')
+        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
         ws_df.drop([0, 1], inplace=True)
         ws_df.drop(columns=['A'], inplace=True)
 
         absent_data = {}
-        result_values = np.zeros((len(filters), 30))
+        result_values = np.zeros((len(filters), ws_df.shape[0] + 2)) #тк удалены 2 строки
 
         for filter in filters:
             absent_data[filter] = {}
@@ -50,15 +86,14 @@ class FileService:
                 res_row += 1
             k = list(value.keys())
             v = list(value.values())
-            # print(k)
-            # print(v)
+
             for i in range(len(k)):
                 result_values[res_row][k[i] - 1] = v[i]
 
-        body = {"valueInputOption": "USER_ENTERED", "data": [{"range": "F3:G22", "majorDimension": "COLUMNS",
-                                                              "values": [[result_values[0]], [result_values[1]]]}]}
+        return result_values
 
-        return body
+
+
 
 
 file_service = FileService()
