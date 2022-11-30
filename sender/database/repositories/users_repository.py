@@ -23,7 +23,8 @@ class UsersRepository:
 
     @classmethod
     def delete_user_by_id(cls, db: Session, telegram_id: str) -> None:
-        obj = db.query(UserOrm).get(telegram_id)
+        user = cls.get_user_by_id(db, telegram_id)
+        obj = db.query(UserOrm).get(user.id)
         db.delete(obj)
         db.commit()
         db.close()

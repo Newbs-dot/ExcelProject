@@ -6,4 +6,5 @@ class BotState(StatesGroup):
     select_filters = State()
     select_month = State()
     add_filter = State()
+    bot_menu = State()
     send_google_url = State()
