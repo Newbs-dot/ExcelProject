@@ -3,7 +3,7 @@ from aiogram.dispatcher import FSMContext
 
 from api_drivers import google_sheet_driver
 from bot import BotState
-from utils import filter_helper, file_helper
+from utils import filter_helper, file_helper, get_months_buttons, get_month_by_key
 
 
 async def start_handler(message: types.Message, state: FSMContext) -> None:
@@ -32,9 +32,9 @@ async def upload_files_handler(message: types.Message, files: list[types.Message
 
 async def select_filters_handler(message: types.Message, state: FSMContext) -> None:
     if await filter_helper.can_change_state(state, message.text):
-        await message.answer('Введите ссылку на Google Диск с итоговым файлом',
-                             reply_markup=types.ReplyKeyboardRemove())
-        await BotState.send_google_url.set()
+        await message.answer('Выберите месяц для создания листа в итоговом файле:',
+                             reply_markup=get_months_buttons())
+        await BotState.select_month.set()
         return
 
     selected_filters = await filter_helper.add_filter_to_state(state, message.text)
@@ -43,12 +43,25 @@ async def select_filters_handler(message: types.Message, state: FSMContext) -> N
     await message.answer('Выберите критерии подсчета дней:', reply_markup=filter_buttons_markup)
 
 
+async def select_handler_handler(message: types.Message, state: FSMContext) -> None:
+    month = get_month_by_key(message.text)
+
+    data = await state.get_data()
+    data['month'] = month
+    await state.update_data(data=data)
+
+    await message.answer('Введите ссылку на Google Диск с итоговым файлом',
+                         reply_markup=types.ReplyKeyboardRemove())
+    await BotState.send_google_url.set()
+
+
 async def send_google_url_handler(message: types.Message, state: FSMContext) -> None:
     data = await state.get_data()
     url = message.values.get('text')
     filters = data['filters']
     files = data['files']
+    month = data['month']
     await message.answer('бот начал работу')
-    await google_sheet_driver.write_data_in_table(url, filters, files)
+    await google_sheet_driver.write_data_in_table(url, filters, files, month)
     await message.answer('результат записан в файл')
     await state.finish()

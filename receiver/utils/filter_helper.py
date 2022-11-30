@@ -1,6 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from api_drivers import filters_driver
 from receiver.models import filter_type, GoogleSheetsFilterItem
 
 
@@ -24,7 +25,7 @@ class FilterHelper:
 
     @classmethod
     async def get_filter_buttons_markup(cls, selected_filter_list: list[GoogleSheetsFilterItem]) -> types.ReplyKeyboardMarkup:
-        all_filter_list = ['Болезнь', 'Отпуск', 'Прогул']  # запрос на получение всех фильтров пользователя
+        all_filter_list = list(map(lambda x: x['name'], (await filters_driver.get_filters())))
         buttons = []
 
         for filter_text in list(filter(lambda all_filter: all_filter not in map(lambda selected_filter: selected_filter['name'], selected_filter_list), all_filter_list)):
