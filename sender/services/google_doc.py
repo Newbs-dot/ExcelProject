@@ -26,9 +26,4 @@ async def write_data_by_url(url, data):  # data еще
                     cell = 'G' + str(i + 1)
                     work_sheet.update(cell, str(data['Vac_days'][index]))
 
-    # tests
-    # print(ws_to_dataframe)
-    # print(fuzz.partial_ratio('Маша','Саша'))
-    # print(fuzz.partial_ratio('БорАлександра', 'КовАлександр'))
-    # print(work_sheet.update('F3',10))
     print('write data in google doc')
