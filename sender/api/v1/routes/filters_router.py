@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db, filters_repository
-from models import SuccessResponse, FilterCreate, Filter
+from sender.models import SuccessResponse, FilterCreate, Filter
 
 router = APIRouter()
 

@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from models import User, UserCreate, role
+from sender.models import User, UserCreate, role
 from ..orms import UserOrm
 
 
