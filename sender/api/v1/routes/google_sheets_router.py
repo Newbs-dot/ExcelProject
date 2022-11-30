@@ -14,6 +14,6 @@ async def update_table(update_table_schema: GoogleSheetsUpdateTable):
     if file_id is None:
         raise HTTPException(status_code=402, detail='Invalid google table url')
 
-    write_by_file_url(update_table_schema.url, update_table_schema.files, update_table_schema.filters, 'январь')
+    write_by_file_url(update_table_schema.url, update_table_schema.files, update_table_schema.filters, update_table_schema.month)
 
     return SuccessResponse()

@@ -1,11 +1,14 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from api_drivers import filters_driver
 from receiver.models import filter_type, GoogleSheetsFilterItem
 
 
 class FilterHelper:
     _end_button_text: str = 'Закончить выбор фильтров'
+
+    all_filter_list = None
 
     @classmethod
     async def add_filter_to_state(cls, state: FSMContext, filter_text: str) -> list[str]:
@@ -22,15 +25,16 @@ class FilterHelper:
 
         return data['filters']
 
-    @classmethod
-    async def get_filter_buttons_markup(cls, selected_filter_list: list[GoogleSheetsFilterItem]) -> types.ReplyKeyboardMarkup:
-        all_filter_list = ['Болезнь', 'Отпуск', 'Прогул']  # запрос на получение всех фильтров пользователя
+    async def get_filter_buttons_markup(self, selected_filter_list: list[GoogleSheetsFilterItem]) -> types.ReplyKeyboardMarkup:
+        if self.all_filter_list is None:
+            self.all_filter_list = list(map(lambda x: x['name'], (await filters_driver.get_filters())))
+
         buttons = []
 
-        for filter_text in list(filter(lambda all_filter: all_filter not in map(lambda selected_filter: selected_filter['name'], selected_filter_list), all_filter_list)):
+        for filter_text in list(filter(lambda all_filter: all_filter not in map(lambda selected_filter: selected_filter['name'], selected_filter_list), self.all_filter_list)):
             buttons.append([types.KeyboardButton(text=filter_text + '✅'), types.KeyboardButton(text=filter_text + '❌')])
 
-        buttons.append([types.KeyboardButton(text=cls._end_button_text)])
+        buttons.append([types.KeyboardButton(text=self._end_button_text)])
 
         return types.ReplyKeyboardMarkup(keyboard=buttons)
 
