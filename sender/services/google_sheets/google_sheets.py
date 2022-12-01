@@ -17,7 +17,7 @@ def write_by_file_url(url: str, files: list[str], filters: list[GoogleSheetsFilt
         i = 0
         for key, val in cols.items():
             for row in range(ranges[0], ranges[1]):
-                if (google_doc.cell(row + 1, int(val) + 1).value == '0'):
+                if (google_doc.cell(row + 1, int(val) + 1).value == None or google_doc.cell(row + 1, int(val) + 1).value == '0'):
                     google_doc.update_cell(row + 1, int(val) + 1, body[i][row])
                     time.sleep(0.1)  # лимит на write requests, то же самое для read requests
             i += 1

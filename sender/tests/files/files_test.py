@@ -2,7 +2,7 @@ import unittest
 
 from sender.models.schemas.google_sheets import GoogleSheetsFilterItem
 
-from services.credentials import credentials_service
+from services.credentials import gspread_read
 from services.files import file_service
 from tables_in_bytes import byte_files
 
@@ -15,7 +15,7 @@ class MyTestCase(unittest.TestCase):
         filters_list.append(filter1)
         filters_list.append(filter2)
 
-        google_doc = credentials_service.gspread_read('https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154'
+        google_doc = gspread_read('https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154'
                                                       , 'январь')
 
         cols = file_service.find_filters_cols(google_doc, filters_list)
@@ -26,7 +26,8 @@ class MyTestCase(unittest.TestCase):
         i = 0
         for key, val in cols.items():
             for row in range(ranges[0], ranges[1]):
-                google_doc.update_cell(row + 1, int(val) + 1, body[i][row])
+                if (google_doc.cell(row + 1, int(val) + 1).value == '0'):
+                    print('0')
             i += 1
 
 
