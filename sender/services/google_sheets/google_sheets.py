@@ -6,16 +6,20 @@ from services.credentials import gspread_read
 from services.files import file_service
 
 
-def write_by_file_url(url: str, files: list[str], filters: list[GoogleSheetsFilterItem], month: str) -> None:
+def write_by_file_url(url: str, files: list[str], config_json : str) -> None:
+    month = config_json['configs'][0]['lists_range'][0]
+    filters = file_service.find_filters(config_json)
+    #filters = list(cols.keys())
+
     google_doc = gspread_read(url, month)
-    cols = file_service.find_filters_cols(google_doc, filters)
+
 
     for file in files:
-        body = file_service.count_days(google_doc, file_service.get_data_from_file(base64.b64decode(file)), file_service.find_active_filters(filters))
+        body = file_service.count_days(google_doc, file_service.get_data_from_file(base64.b64decode(file)), filters)
         ranges = file_service.find_doc_range(google_doc)
 
         i = 0
-        for key, val in cols.items():
+        for key, val in filters.items():
             for row in range(ranges[0], ranges[1]):
                 if ((google_doc.cell(row + 1, int(val) + 1).value == None) or (google_doc.cell(row + 1, int(val) + 1).value == '0')):
                     google_doc.update_cell(row + 1, int(val) + 1, body[i][row])

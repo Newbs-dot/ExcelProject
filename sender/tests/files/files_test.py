@@ -13,7 +13,7 @@ class MyTestCase(unittest.TestCase):
         js = {
             "url": "https://google.com",
             "configs": [
-                {  # config1
+                {
                     "filters": [
                         {
                             "filter": "Болезнь",
@@ -50,7 +50,7 @@ class MyTestCase(unittest.TestCase):
         #ranges = file_service.find_doc_range(google_doc)
         filters = list(cols.keys())
 
-
+        '''
         for file in byte_files:
             body = file_service.count_days(google_doc, file_service.get_data_from_file(byte_files[0]),cols)
             ranges = file_service.find_doc_range(google_doc)
@@ -64,6 +64,8 @@ class MyTestCase(unittest.TestCase):
                         time.sleep(0.1)  # лимит на write requests, то же самое для read requests
                 i += 1
             pass
+        '''
+        print(cols)
 
 if __name__ == '__main__':
     unittest.main()
