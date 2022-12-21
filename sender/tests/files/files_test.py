@@ -46,13 +46,13 @@ class MyTestCase(unittest.TestCase):
         google_doc = gspread_read('https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154'
                                                       , 'январь')
         #body = file_service.count_days(google_doc, file_service.get_data_from_file(byte_files[0]),filters_dict)
-        cols = filters_dict
+        cols = file_service.find_filters(js)
         #ranges = file_service.find_doc_range(google_doc)
-        filters = list(filters_dict.keys())
+        filters = list(cols.keys())
 
 
         for file in byte_files:
-            body = file_service.count_days(google_doc, file_service.get_data_from_file(byte_files[0]),filters_dict)
+            body = file_service.count_days(google_doc, file_service.get_data_from_file(byte_files[0]),cols)
             ranges = file_service.find_doc_range(google_doc)
 
             i = 0

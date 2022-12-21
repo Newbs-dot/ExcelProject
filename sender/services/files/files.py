@@ -10,8 +10,8 @@ class FileService:
     def format_fio(self, fio):
         return fio.split()[0] + fio.split()[1]
 
-    def convert_to_dict(self,list):
-        it = iter(list)
+    def convert_to_dict(self,li):
+        it = iter(li)
         res_dct = dict(zip(it, it))
         return res_dct
 
@@ -79,9 +79,13 @@ class FileService:
         filters_list = []
         for filtr in config_json['configs'][0]['filters']:
             filters_list.append(list(filtr.values()))
+
+        filters_list = sum(filters_list,[])
+
         for i in range(len(filters_list)):
             if (len(filters_list[i]) == 1):
                 filters_list[i] = alphabet[filters_list[i]]
+
         filters_dict = self.convert_to_dict(filters_list)
 
         return filters_dict
