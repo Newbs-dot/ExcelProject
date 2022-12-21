@@ -10,6 +10,11 @@ class FileService:
     def format_fio(self, fio):
         return fio.split()[0] + fio.split()[1]
 
+    def convert_to_dict(self,list):
+        it = iter(list)
+        res_dct = dict(zip(it, it))
+        return res_dct
+
     def get_data_from_file(self, file):
         org_table = pd.read_excel(file, skiprows=6, usecols=range(0, 6), header=None,
                                   names=['Name', 'Nan', 'Vac_type', 'Nan1', 'Work_days', 'Vac_days'])
@@ -72,11 +77,11 @@ class FileService:
             'Y': 24, 'Z': 25
         }
         filters_list = []
-        for fltr in config_json['configs'][0]['filters']:
-            filters_list.append(list(fltr.values()))
-        for fltr in filters_list:
-            if (len(fltr) == 1):
-                fltr = alphabet[fltr]
+        for filtr in config_json['configs'][0]['filters']:
+            filters_list.append(list(filtr.values()))
+        for i in range(len(filters_list)):
+            if (len(filters_list[i]) == 1):
+                filters_list[i] = alphabet[filters_list[i]]
         filters_dict = self.convert_to_dict(filters_list)
 
         return filters_dict
