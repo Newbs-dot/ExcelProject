@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from fuzzywuzzy import fuzz
-
+import json
 from sender.models.schemas.google_sheets import GoogleSheetsFilterItem
 
 
@@ -17,6 +17,7 @@ class FileService:
         org_table['Name'] = org_table.apply(lambda row: self.format_fio(row['Name']), axis=1)
         return org_table
 
+    #DEPRECATED
     def find_active_filters(self, filters: list[GoogleSheetsFilterItem]):
         active_filters = []
         for filter in filters:
@@ -35,7 +36,8 @@ class FileService:
         doc_range.append(last_entry)
         return doc_range
 
-    def find_filters_cols(self, google_doc, filters):
+    #deprecated
+    def find_filters_cols(self, google_doc, filters): 
         # google_doc = credentials_service.gspread_read(url, worksheet_name)
         data = google_doc.get_values('A:H')
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
@@ -54,12 +56,39 @@ class FileService:
 
         return filters_dict
 
-    def count_days(self, google_doc, org_data, filters):
+    def find_filters(self, config): # Фильтры указываются явно, как в исходных таблицах
+        config_to_str = json.dumps(config)
+        config_json = json.loads(config_to_str)
+
+        alphabet = {
+            'A': 0, 'B': 1, 'C': 2,
+            'D': 3, 'E': 4, 'F': 5,
+            'G': 6, 'H': 7, 'I': 8,
+            'J': 9, 'K': 10, 'L': 11,
+            'M': 12, 'N': 13, 'O': 14,
+            'P': 15, 'Q': 16, 'R': 17,
+            'S': 18, 'T': 19, 'U': 20,
+            'V': 21, 'W': 22, 'X': 23,
+            'Y': 24, 'Z': 25
+        }
+        filters_list = []
+        for fltr in config_json['configs'][0]['filters']:
+            filters_list.append(list(fltr.values()))
+        for fltr in filters_list:
+            if (len(fltr) == 1):
+                fltr = alphabet[fltr]
+        filters_dict = self.convert_to_dict(filters_list)
+
+        return filters_dict
+
+    def count_days(self, google_doc, org_data, filters_dict):
         # google_doc = credentials_service.gspread_read(url, worksheet_name)
         data = google_doc.get_values('A:H')
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
         ws_df.drop([0, 1], inplace=True)
         ws_df.drop(columns=['A'], inplace=True)
+
+        filters = list(filters_dict.keys())
 
         absent_data = {}
         result_values = np.zeros((len(filters), ws_df.shape[0] + 2))  # тк удалены 2 строки
@@ -73,7 +102,7 @@ class FileService:
                 res_table_name = str(ws_df['B'][i] + ws_df['C'][i])
                 if fuzz.ratio(org_table_name, res_table_name) > 85:
                     for filter in filters:
-                        if (filter in str(org_data['Vac_type'][index])):
+                        if (filter in str(org_data['Vac_type'][index])): #Фильтры указываются ЯВНО из исходных таблиц
                             absent_data[filter][i + 1] = str(org_data['Vac_days'][index])
 
         filters = list(absent_data.keys())
