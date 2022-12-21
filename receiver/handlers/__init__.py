@@ -7,3 +7,4 @@ from .handlers import select_month_handler
 from .handlers import table_handler
 from .handlers import bot_menu_handler
 from .handlers import add_filter_handler
+from .handlers import config_download_handler

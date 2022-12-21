@@ -2,8 +2,8 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from sender.models import User, UserCreate, role
-from ..orms import UserOrm
+from sender.models import User, UserCreate, role, Config
+from ..orms import UserOrm, ConfigOrm
 
 
 class UsersRepository:
@@ -50,6 +50,16 @@ class UsersRepository:
         db.close()
 
         return user
+
+    @classmethod
+    def create_user_config(cls, db: Session, url: str, file: str, telegram_id: str) -> Config:
+        db_config = ConfigOrm(file=file, name=url, telegram_id=telegram_id)
+        db.add(db_config)
+        db.commit()
+        db.refresh(db_config)
+        db.close()
+
+        return db_config
 
 
 users_repository = UsersRepository()

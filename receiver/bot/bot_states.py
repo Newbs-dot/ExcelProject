@@ -8,3 +8,4 @@ class BotState(StatesGroup):
     add_filter = State()
     bot_menu = State()
     send_google_url = State()
+    config_file = State()

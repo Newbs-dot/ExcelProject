@@ -13,6 +13,4 @@ class GoogleSheetsFilterItem(GoogleSheets):
 
 class GoogleSheetsUpdateTable(GoogleSheets):
     url: str
-    filters: list[GoogleSheetsFilterItem]
     files: list[str]
-    month: str

@@ -1,9 +1,13 @@
+import base64
+from io import BytesIO
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from api_drivers import config_driver
 from api_drivers import google_sheet_driver, users_driver, filters_driver
 from bot import BotState
-from receiver.models import role
+from bot import bot
 from utils import filter_helper, file_helper, get_months_buttons, get_month_by_key
 
 
@@ -12,25 +16,21 @@ async def start_handler(message: types.Message, state: FSMContext) -> None:
     await message.answer('производится регистрация пользователя', reply_markup=types.ReplyKeyboardRemove())
     telegram_id = message.from_user.id
     await users_driver.create_user(telegram_id)
-    buttons = [[types.KeyboardButton(text='Начать работу')], [types.KeyboardButton(text='Закончить работу')]]
+    buttons = [
+        [types.KeyboardButton(text='Начать работу')],
+        [types.KeyboardButton(text='Закончить работу')],
+        [types.KeyboardButton(text='Конфигурационный файл')]
+    ]
     await message.answer('Выберите действие бота', reply_markup=types.ReplyKeyboardMarkup(keyboard=buttons))
     await BotState.bot_menu.set()
 
 
 async def table_handler(message: types.Message, state: FSMContext) -> None:
-    filter_helper.all_filter_list = None
-    await message.answer('производится авторизация пользователя', reply_markup=types.ReplyKeyboardRemove())
-    telegram_id = message.from_user.id
-    users = await users_driver.get_user(telegram_id)
-    try:
-        current_role = [user for user in users if user['telegram_id'] in str(telegram_id)][0]['role']
-    except Exception as e:
-        current_role = role.User
-
-    if current_role == role.User:
-        buttons = [[types.KeyboardButton(text='Начать работу')], [types.KeyboardButton(text='Закончить работу')]]
-    else:
-        buttons = [[types.KeyboardButton(text='Начать работу')], [types.KeyboardButton(text='Закончить работу')], [types.KeyboardButton(text='Добавить фильтры')]]
+    buttons = [
+        [types.KeyboardButton(text='Начать работу')],
+        [types.KeyboardButton(text='Закончить работу')],
+        [types.KeyboardButton(text='Конфигурационный файл')]
+    ]
 
     await message.answer('Выберите действие бота', reply_markup=types.ReplyKeyboardMarkup(keyboard=buttons))
     await BotState.bot_menu.set()
@@ -44,9 +44,31 @@ async def bot_menu_handler(message: types.Message, state: FSMContext) -> None:
     elif text == 'Закончить работу':
         await message.answer('Бот прекратил работу', reply_markup=types.ReplyKeyboardRemove())
         await state.finish()
-    elif text == 'Добавить фильтры':
-        await message.answer('Введите название фильтра', reply_markup=types.ReplyKeyboardRemove())
-        await state.set_state(BotState.add_filter)
+    elif text == 'Конфигурационный файл':
+        await message.answer('Загрузите файл конфигурации', reply_markup=types.ReplyKeyboardRemove())
+        await state.set_state(BotState.config_file)
+
+
+async def config_download_handler(message: types.Message, files: list[types.Message], state: FSMContext) -> None:
+    res = []
+
+    for file in files:
+        downloaded_file = await bot.download_file_by_id(file[file.content_type].file_id)
+        bytes_io = BytesIO()
+        bytes_io.write(downloaded_file.getvalue())
+        encoded = base64.b64encode(bytes_io.getvalue())
+        res.append(encoded.decode('ascii'))
+
+    file = res[0]
+    await message.answer('Конфиг загружается', reply_markup=types.ReplyKeyboardRemove())
+    await config_driver.create_config(message.from_user.id, file)
+    buttons = [
+        [types.KeyboardButton(text='Начать работу')],
+        [types.KeyboardButton(text='Закончить работу')],
+        [types.KeyboardButton(text='Конфигурационный файл')]
+    ]
+    await message.answer('Выберите действие бота', reply_markup=types.ReplyKeyboardMarkup(keyboard=buttons))
+    await BotState.bot_menu.set()
 
 
 async def add_filter_handler(message: types.Message, state: FSMContext) -> None:
@@ -75,10 +97,9 @@ async def upload_files_handler(message: types.Message, files: list[types.Message
         return
 
     await file_helper.set_files_state(files, state)
-    filter_buttons_markup = await filter_helper.get_filter_buttons_markup([])
 
-    await message.answer('Выберите критерии подсчета дней:', reply_markup=filter_buttons_markup)
-    await BotState.select_filters.set()
+    await message.answer('Введите ссылку на Google Диск с итоговым файлом', reply_markup=types.ReplyKeyboardRemove())
+    await BotState.send_google_url.set()
 
 
 async def select_filters_handler(message: types.Message, state: FSMContext) -> None:
@@ -109,10 +130,8 @@ async def select_month_handler(message: types.Message, state: FSMContext) -> Non
 async def send_google_url_handler(message: types.Message, state: FSMContext) -> None:
     data = await state.get_data()
     url = message.values.get('text')
-    filters = data['filters']
     files = data['files']
-    month = data['month']
     await message.answer('бот начал работу')
-    await google_sheet_driver.write_data_in_table(url, filters, files, month)
+    await google_sheet_driver.write_data_in_table(url, files)
     await message.answer('результат записан в файл')
     await state.finish()

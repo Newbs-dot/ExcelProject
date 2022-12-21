@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 
+from .config import Config
+
 
 class UserSchema(BaseModel):
     class Config:
@@ -10,6 +12,7 @@ class User(UserSchema):
     id: int
     telegram_id: str
     role: str
+    configs: list[Config] = []
 
 
 class UserCheck(UserSchema):

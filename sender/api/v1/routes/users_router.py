@@ -1,8 +1,11 @@
+import base64
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database import get_db, users_repository
-from sender.models import User, SuccessResponse, UserCreate, UserUpdateRole, role
+from sender.models import User, SuccessResponse, UserCreate, UserUpdateRole, role, ConfigCreate
 
 router = APIRouter()
 
@@ -12,7 +15,7 @@ async def get_users(db: Session = Depends(get_db)) -> list[User]:
     return users_repository.get_users(db)
 
 
-@router.get('/{telegramId}')
+@router.get('/{telegram_id}')
 async def get_user(telegram_id: str, db: Session = Depends(get_db)) -> User | HTTPException:
     user = users_repository.get_user_by_id(db, telegram_id)
     if user is None:
@@ -28,6 +31,18 @@ async def create_user(user_create: UserCreate, db: Session = Depends(get_db)) ->
         raise HTTPException(status_code=404, detail='User is currently exist')
 
     return SuccessResponse()
+
+
+@router.post('/configs')
+async def create_config_for_user(
+        create_config: ConfigCreate, db: Session = Depends(get_db)
+):
+    file = create_config.file
+    decoded_bytes = base64.b64decode(file)
+    decoded_str = decoded_bytes.decode('utf-8')
+    json_str = json.loads(decoded_str)
+
+    return users_repository.create_user_config(db=db, url=json_str['url'], file=create_config.file, telegram_id=create_config.telegram_id)
 
 
 @router.put('/{telegramId}')
