@@ -23,13 +23,16 @@ class FileService:
         return org_table
 
     #DEPRECATED
-    def find_active_filters(self, filters: list[GoogleSheetsFilterItem]):
+    '''
+        def find_active_filters(self, filters: list[GoogleSheetsFilterItem]):
         active_filters = []
         for filter in filters:
             if filter.type == 'Selected':
                 active_filters.append(filter.name)
 
         return active_filters
+    '''
+
 
     def find_doc_range(self, google_doc):
         data = google_doc.get_values('A:H')
@@ -40,11 +43,12 @@ class FileService:
         doc_range.append(first_entry)
         doc_range.append(last_entry)
         return doc_range
+    #def return_result_lists(self,google_doc):
 
-    #deprecated
-    def find_filters_cols(self, google_doc, filters): 
-        # google_doc = credentials_service.gspread_read(url, worksheet_name)
-        data = google_doc.get_values('A:H')
+    '''
+        def find_filters_cols(self, google_doc, filters, month):
+        ws = google_doc.worksheet(month)
+        data = ws.get_values('A:H')
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
 
         ws_head = ws_df[:1]
@@ -60,6 +64,8 @@ class FileService:
         filters_dict = dict(zip(active_filters, cells))
 
         return filters_dict
+    '''
+
 
     def find_filters(self, config): # Фильтры указываются явно, как в исходных таблицах
         config_to_str = json.dumps(config)
@@ -91,7 +97,6 @@ class FileService:
         return filters_dict
 
     def count_days(self, google_doc, org_data, filters_dict):
-        # google_doc = credentials_service.gspread_read(url, worksheet_name)
         data = google_doc.get_values('A:H')
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
         ws_df.drop([0, 1], inplace=True)

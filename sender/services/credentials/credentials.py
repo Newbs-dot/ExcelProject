@@ -15,13 +15,13 @@ credentials = {
 }
 
 
-def gspread_read(url, month):
+def gspread_read(url,month):
     account_credentials = ServiceAccountCredentials.from_json_keyfile_dict(
         credentials,
         ['https://www.googleapis.com/auth/spreadsheets',
          'https://www.googleapis.com/auth/drive'])
     client = gspread.authorize(account_credentials)
-    sheet = client.open_by_url(url)
-    ws = sheet.worksheet(month)
+    table = client.open_by_url(url)
+    ws = table.worksheet(month)
 
     return ws
