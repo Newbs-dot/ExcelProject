@@ -2,13 +2,13 @@ import base64
 import time
 
 from sender.models import GoogleSheetsFilterItem
-from services.credentials import gspread_read
+from services.credentials import read_table
 from services.files import file_service
 import numpy as np
 
 def write_by_file_url(url: str, files: list[str], config: str) -> None:
     month = config['configs'][0]['lists_range'][0]
-    google_doc = gspread_read(url,month)
+    google_doc = read_table(url, month)
     filters = list(file_service.find_filters(config).keys())
 
 
@@ -20,9 +20,17 @@ def write_by_file_url(url: str, files: list[str], config: str) -> None:
             for i in range(len(body)):
                 result[k][i] = body[i][k]
 
-        google_doc.update('F3:G26', result.tolist())
+        google_doc.update('F3:G26', result.tolist()) #нужен фикс
     pass
 
+def get_lists(url): # for interface use
+    google_doc = read_table(url)
+    worksheets = google_doc[0].worksheets()
+    lists = []
+    for ws in worksheets:
+        lists.append(ws.title)
+
+    return lists
 
 class GoogleSheetService:
     _credentials_file_name = 'creds.json'

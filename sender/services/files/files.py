@@ -22,50 +22,22 @@ class FileService:
         org_table['Name'] = org_table.apply(lambda row: self.format_fio(row['Name']), axis=1)
         return org_table
 
-    #DEPRECATED
-    '''
-        def find_active_filters(self, filters: list[GoogleSheetsFilterItem]):
-        active_filters = []
-        for filter in filters:
-            if filter.type == 'Selected':
-                active_filters.append(filter.name)
+    def find_doc_range(self, google_doc, config):
+        filters = config['filters']
+        columns = []
+        for fl in filters:
+            columns.append(fl['column'])
 
-        return active_filters
-    '''
+        columns = sorted(columns)
 
-
-    def find_doc_range(self, google_doc):
-        data = google_doc.get_values('A:H')
+        data = google_doc.get_values('A:H') #До 6 столбца
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
-        first_entry = int(ws_df[ws_df['A'] == '1'].index[0])
+        first_entry = int(ws_df[ws_df['A'] == '1'].index[0]) + 1 #aaaaaaaa
         last_entry = int(ws_df.shape[0])
-        doc_range = []
-        doc_range.append(first_entry)
-        doc_range.append(last_entry)
+
+        doc_range = f"{columns[0] + str(first_entry)}:{columns[-1] + str(last_entry)}"
+
         return doc_range
-    #def return_result_lists(self,google_doc):
-
-    '''
-        def find_filters_cols(self, google_doc, filters, month):
-        ws = google_doc.worksheet(month)
-        data = ws.get_values('A:H')
-        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
-
-        ws_head = ws_df[:1]
-        cells = []
-        active_filters = self.find_active_filters(filters)
-
-        for i in ws_head:
-            for filter in active_filters:
-                if fuzz.partial_ratio(filter, str(ws_head[i][0])) > 40:
-                    cells.append(str(ws_head.columns.get_loc(i)))
-
-        # filters_df = pd.DataFrame(cells, active_filters, columns=['Column'])
-        filters_dict = dict(zip(active_filters, cells))
-
-        return filters_dict
-    '''
-
 
     def find_filters(self, config): # Фильтры указываются явно, как в исходных таблицах
         config_to_str = json.dumps(config)
@@ -83,7 +55,7 @@ class FileService:
             'Y': 24, 'Z': 25
         }
         filters_list = []
-        for filtr in config_json['configs'][0]['filters']:
+        for filtr in config_json['filters']: #one config
             filters_list.append(list(filtr.values()))
 
         filters_list = sum(filters_list,[])
@@ -94,11 +66,19 @@ class FileService:
 
         filters_dict = self.convert_to_dict(filters_list)
 
-        return filters_dict
+
+        sorted_filters_list = list(filters_dict.values())
+
+        for i in range(min(sorted_filters_list), max(sorted_filters_list)):
+            if i not in sorted_filters_list:
+                filters_dict['empty'+str(i)] = i
+
+        sorted_filters = dict(sorted(filters_dict.items(), key=lambda kv: kv[1]))
+        return sorted_filters
 
     def count_days(self, google_doc, org_data, filters_dict):
-        data = google_doc.get_values('A:H')
-        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
+        data = google_doc.get_values('A:I')       #До 6 столбца !!!!!!!!! Доработать до многих столбцов
+        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'])
         ws_df.drop([0, 1], inplace=True)
         ws_df.drop(columns=['A'], inplace=True)
 
@@ -106,6 +86,7 @@ class FileService:
 
         absent_data = {}
         result_values = np.zeros((len(filters), ws_df.shape[0] + 2))  # тк удалены 2 строки
+
 
         for filter in filters:
             absent_data[filter] = {}
