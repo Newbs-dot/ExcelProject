@@ -40,8 +40,8 @@ class FileService:
         return doc_range
 
     def find_filters(self, config): # Фильтры указываются явно, как в исходных таблицах
-        config_to_str = json.dumps(config)
-        config_json = json.loads(config_to_str)
+        #config_to_str = json.dumps(config)
+        #config_json = json.loads(config_to_str)
 
         alphabet = {
             'A': 0, 'B': 1, 'C': 2,
@@ -55,7 +55,7 @@ class FileService:
             'Y': 24, 'Z': 25
         }
         filters_list = []
-        for filtr in config_json['filters']: #one config
+        for filtr in config['filters']: #one config
             filters_list.append(list(filtr.values()))
 
         filters_list = sum(filters_list,[])
@@ -85,7 +85,8 @@ class FileService:
         filters = list(filters_dict.keys())
 
         absent_data = {}
-        result_values = np.zeros((len(filters), ws_df.shape[0] + 2))  # тк удалены 2 строки
+        result_values = np.zeros((len(filters), ws_df.shape[0]))  # тк удалены 2 строки
+
 
 
         for filter in filters:
@@ -98,7 +99,7 @@ class FileService:
                 if fuzz.ratio(org_table_name, res_table_name) > 85:
                     for filter in filters:
                         if (filter in str(org_data['Vac_type'][index])): #Фильтры указываются ЯВНО из исходных таблиц
-                            absent_data[filter][i + 1] = str(org_data['Vac_days'][index])
+                            absent_data[filter][i - 1] = str(org_data['Vac_days'][index])
 
         filters = list(absent_data.keys())
         current_filter = filters[0]

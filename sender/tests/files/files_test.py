@@ -18,6 +18,13 @@ class MyTestCase(unittest.TestCase):
             lists.append(ws.title)
 
         return lists
+
+    def clean_zeros(self, a):
+        if a == 0:
+            a = ''
+        else:
+            a = int(a)
+        return a
     def test_something(self):
 
         js = {
@@ -34,14 +41,17 @@ class MyTestCase(unittest.TestCase):
           ]
         }
 
-        table = read_table('https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154', 'list2')
+
+        table = read_table(
+            'https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154',
+            'list2')
         google_doc = table[1]
 
         cols = file_service.find_filters(js)
 
         
         
-        body = file_service.count_days(google_doc, file_service.get_data_from_file(byte_files[0]), cols)
+        body = file_service.count_days(google_doc, file_service.get_data_from_file(byte_files[1]), cols)
         print(cols)
         print(body)
 
@@ -50,15 +60,19 @@ class MyTestCase(unittest.TestCase):
 
         #for fltr in js['configs'][0]['filters']:
         #    print(fltr['column'])
-
-
         result = np.zeros(shape = (len(body[0]),len(cols)))
 
         for k in range(len(body[0])):
             for i in range(len(body)):
                 result[k][i] = body[i][k]
 
-        google_doc.update('F3:J30', result.tolist())
+        result = [[self.clean_zeros(val) for val in sublist]for sublist in result]
+        print(result)
+        google_doc.update('F3:J30', result)
+        
+        
+
+
 
 
 
