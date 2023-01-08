@@ -11,9 +11,9 @@ router = APIRouter()
 async def get_google_sheets_lists(response: Response) -> GoogleSheetsList | BadResponse:
     try:
         url = settings.API_CONFIG['url']
-        lists = get_lists(url)
+        name_list = get_lists(url)
 
-        return GoogleSheetsList(list=lists)
+        return GoogleSheetsList(name_list=name_list)
     except Exception:
         resp = BadResponse(text='Неправильный url или credential')
         response.status_code = resp.status
@@ -29,7 +29,7 @@ async def update_google_sheets(update_table_schema: GoogleSheetsUpdateTable, res
 
         return SuccessResponse()
     except:
-        resp = BadResponse(text='Неправильные загруженные файлы или неверно проставленные фильтры')
+        resp = BadResponse(text='Неправильные загруженные файлы, или неверно проставленные фильтры, или неверно выбран лист')
         response.status_code = resp.status
 
         return resp

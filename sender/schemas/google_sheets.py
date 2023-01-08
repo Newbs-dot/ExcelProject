@@ -7,7 +7,7 @@ class GoogleSheets(BaseModel):
 
 
 class GoogleSheetsList(GoogleSheets):
-    list: list[str]
+    name_list: list[str]
 
 
 class GoogleSheetsUpdateTable(GoogleSheets):
