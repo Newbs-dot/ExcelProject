@@ -76,6 +76,7 @@ class FileService:
         sorted_filters = dict(sorted(filters_dict.items(), key=lambda kv: kv[1]))
         return sorted_filters
 
+
     def count_days(self, google_doc, org_data, filters_dict):
         data = google_doc.get_values('A:I')       #До 6 столбца !!!!!!!!! Доработать до многих столбцов
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'])

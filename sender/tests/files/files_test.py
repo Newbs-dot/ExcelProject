@@ -52,29 +52,34 @@ class MyTestCase(unittest.TestCase):
 
         cols = file_service.find_filters(js)
 
+        aggregated_result = []
 
         for f in self.files:
             t = BytesIO(base64.b64decode(f))
-            
             body = file_service.count_days(google_doc, file_service.get_data_from_file(t), cols)
-            print(cols)
-            print(body)
+            aggregated_result += [body]
 
-        
-            ranges = file_service.find_doc_range(google_doc,js)
+        aggregated_result = np.array(aggregated_result)
 
-        #for fltr in js['configs'][0]['filters']:
-        #    print(fltr['column'])
-            result = np.zeros(shape = (len(body[0]),len(cols)))
+        #ranges = file_service.find_doc_range(google_doc,js)
+        #result = np.zeros(shape = (len(body[0]),len(cols)))
 
-            for k in range(len(body[0])):
-                for i in range(len(body)):
-                    result[k][i] = body[i][k]
+        result = np.zeros(shape = (len(aggregated_result[0]),len(aggregated_result[0][0])))
 
-            result = [[self.clean_zeros(val) for val in sublist]for sublist in result]
-            print(result)
-            google_doc.update('F3:J30', result)
-        
+        for k, v in enumerate(aggregated_result):
+            for i in range(len(result)):
+                result[i] = np.sum([result[i], v[i]], axis=0)
+
+        result = np.transpose(result)
+
+        #for k in range(len(body[0])):
+        #    for i in range(len(body)):
+        #        result[k][i] = body[i][k]
+
+        result = [[self.clean_zeros(val) for val in sublist]for sublist in result]
+        print(result)
+        google_doc.update('F3:J30', result)
+
         
 
 
