@@ -6,11 +6,10 @@ class GoogleSheets(BaseModel):
         arbitrary_types_allowed = True
 
 
-class GoogleSheetsFilterItem(GoogleSheets):
-    name: str
-    type: str
+class GoogleSheetsList(GoogleSheets):
+    list: list[str]
 
 
 class GoogleSheetsUpdateTable(GoogleSheets):
-    url: str
+    list_name: str
     files: list[str]

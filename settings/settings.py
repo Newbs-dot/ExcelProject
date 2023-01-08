@@ -1,24 +1,35 @@
+import json
 import os
 
-from dotenv import load_dotenv
-from pydantic import BaseSettings
+
+class Settings:
+    __slots__ = (
+        "API_ROOT_URL",
+        "API_HOST",
+        "API_PORT",
+        "API_PROJECT_NAME",
+        "API_PREFIX",
+        "TG_BOT_TOKEN",
+        "API_GOOGLE_CREDS",
+        "API_CONFIG",
+    )
+
+    def __init__(self):
+        try:
+            settings_file = f'{os.path.dirname(os.path.join(os.path.abspath(__file__)))}\\settings.json'
+            user_settings = json.load(open(settings_file, encoding='utf-8'))
+
+            for user_setting_key in user_settings:
+                setattr(self, user_setting_key, user_settings[user_setting_key])
+
+        except IndexError:
+            raise IndexError('Неправильное название файла с настройками')
+        except FileNotFoundError:
+            raise FileNotFoundError('Не найден файл с настройками')
+        except json.JSONDecodeError:
+            raise json.JSONDecodeError('Файл настройек должен быть json формата')
+        except AttributeError:
+            raise AttributeError('Нет нужной настройки настроек')
 
 
-class Settings(BaseSettings):
-    TG_BOT_TOKEN: str = os.getenv('TG_BOT_TOKEN')
-    TG_API_ID: str = os.getenv('TG_API_ID')
-    TG_API_HASH: str = os.getenv('TG_API_HASH')
-    TG_SESSION_NAME: str = os.getenv('TG_SESSION_NAME')
-
-    API_ROOT_URL: str = os.getenv('API_ROOT_URL')
-    API_SECRET_KEY: str = os.getenv('API_SECRET_KEY')
-    API_PROJECT_NAME: str = os.getenv('API_PROJECT_NAME')
-    API_PREFIX: str = os.getenv('API_PREFIX')
-    API_DATABASE_URL: str = os.getenv('API_DATABASE_URL')
-
-    class Config:
-        case_sensitive = True
-
-
-load_dotenv()
 settings = Settings()

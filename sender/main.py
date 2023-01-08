@@ -1,4 +1,6 @@
 import uvicorn
 
-if __name__ == "__main__":
-    uvicorn.run("app:app", port=8000, host='0.0.0.0', reload=True)
+from settings import settings
+
+if __name__ == '__main__':
+    uvicorn.run('app:app', port=settings.API_PORT, host=settings.API_HOST, reload=True)
