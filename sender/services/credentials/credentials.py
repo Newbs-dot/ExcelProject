@@ -15,13 +15,20 @@ credentials = {
 }
 
 
-def gspread_read(url, month):
+def read_table(url, month = None):
     account_credentials = ServiceAccountCredentials.from_json_keyfile_dict(
         credentials,
         ['https://www.googleapis.com/auth/spreadsheets',
          'https://www.googleapis.com/auth/drive'])
     client = gspread.authorize(account_credentials)
-    sheet = client.open_by_url(url)
-    ws = sheet.worksheet(month)
+    table = client.open_by_url(url)
+    #?
+    if month != None:
+        ws = table.worksheet(month)
+    else:
+        ws = table.get_worksheet(0)
 
-    return ws
+    return table,ws  # return table itself and one worksheet selected by month as tuple
+
+
+
