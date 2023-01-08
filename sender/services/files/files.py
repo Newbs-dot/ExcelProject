@@ -32,7 +32,7 @@ class FileService:
 
         data = google_doc.get_values('A:H') #До 6 столбца
         ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
-        first_entry = int(ws_df[ws_df['A'] == '1'].index[0]) + 1 #aaaaaaaa
+        first_entry = int(ws_df[ws_df['A'] == '1'].index[0] + 1)  #.index с нуля
         last_entry = int(ws_df.shape[0])
 
         doc_range = f"{columns[0] + str(first_entry)}:{columns[-1] + str(last_entry)}"
@@ -99,7 +99,7 @@ class FileService:
                 res_table_name = str(ws_df['B'][i] + ws_df['C'][i])
                 if fuzz.ratio(org_table_name, res_table_name) > 85:
                     for filter in filters:
-                        if (filter in str(org_data['Vac_type'][index])): #Фильтры указываются ЯВНО из исходных таблиц
+                        if (filter == str(org_data['Vac_type'][index])): #Фильтры указываются ЯВНО, как в исходных таблицах
                             absent_data[filter][i - 1] = str(org_data['Vac_days'][index])
 
         filters = list(absent_data.keys())

@@ -34,13 +34,17 @@ class MyTestCase(unittest.TestCase):
           "url": "https://docs.google.com/spreadsheets/d/1vC2Pt9sQWvU8GEQD6xqcaLbdKsd7YESiqF9PwapZUb0/edit#gid=1198610154",
           "filters": [
             {
-              "filter": "Отпуск",
-              "column": "I"
+                "filter": "Отпуск основной",
+                "column": "I"
             },
             {
-              "filter": "Болезнь",
-              "column": "F"
-            }
+                "filter": "Болезнь",
+                "column": "F"
+            },
+            {
+                "filter": "Отпуск по уходу за ребенком",
+                "column": "G"
+            },
           ]
         }
 
@@ -51,7 +55,7 @@ class MyTestCase(unittest.TestCase):
         google_doc = table[1]
 
         cols = file_service.find_filters(js)
-
+        ranges = file_service.find_doc_range(google_doc,js)
         aggregated_result = []
 
         for f in self.files:
@@ -61,9 +65,6 @@ class MyTestCase(unittest.TestCase):
 
         aggregated_result = np.array(aggregated_result)
 
-        #ranges = file_service.find_doc_range(google_doc,js)
-        #result = np.zeros(shape = (len(body[0]),len(cols)))
-
         result = np.zeros(shape = (len(aggregated_result[0]),len(aggregated_result[0][0])))
 
         for k, v in enumerate(aggregated_result):
@@ -72,13 +73,9 @@ class MyTestCase(unittest.TestCase):
 
         result = np.transpose(result)
 
-        #for k in range(len(body[0])):
-        #    for i in range(len(body)):
-        #        result[k][i] = body[i][k]
-
         result = [[self.clean_zeros(val) for val in sublist]for sublist in result]
-        print(result)
-        google_doc.update('F3:J30', result)
+
+        google_doc.update(ranges, result)
 
         
 
