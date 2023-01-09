@@ -5,13 +5,8 @@ import os
 class Settings:
     __slots__ = (
         "API_ROOT_URL",
-        "API_HOST",
-        "API_PORT",
-        "API_PROJECT_NAME",
         "API_PREFIX",
         "TG_BOT_TOKEN",
-        "API_GOOGLE_CREDS",
-        "API_CONFIG",
     )
 
     def __init__(self):
