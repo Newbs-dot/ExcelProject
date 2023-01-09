@@ -16,7 +16,7 @@ class Settings:
 
     def __init__(self):
         try:
-            settings_file = f'{os.path.dirname(os.path.join(os.path.abspath(__file__)))}\\settings.json'
+            settings_file = os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), 'settings.json')
             user_settings = json.load(open(settings_file, encoding='utf-8'))
 
             for user_setting_key in user_settings:
