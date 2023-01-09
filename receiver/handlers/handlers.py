@@ -53,9 +53,9 @@ async def select_lists_handler(message: types.Message, state: FSMContext) -> Non
     await message.answer('Бот начал работу', reply_markup=types.ReplyKeyboardRemove())
     response = await google_sheet_driver.update_google_sheets_table(list_name, files)
 
-    if type(response) is BadResponse:
+    try:
         await message.answer(response.text)
-    else:
+    except Exception:
         await message.answer('Результат записан в файл')
 
     await state.finish()

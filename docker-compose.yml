@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  sender:
+    command: sh -c "python3 main.py"
+    build:
+      context: ./sender
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./sender:/sender
+    tty: true
+    networks:
+      - localhost
+
+  receiver:
+    command: sh -c "python3 main.py"
+    build:
+      context: ./receiver
+      dockerfile: Dockerfile
+    volumes:
+      - ./receiver:/receiver
+    tty: true
+    stdin_open: true
+    networks:
+      - localhost
+
+networks:
+  localhost:
+    driver: bridge
