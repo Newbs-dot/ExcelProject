@@ -1,0 +1,2 @@
+class SuccessResponse:
+    status: str

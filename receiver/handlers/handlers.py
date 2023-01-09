@@ -1,12 +1,23 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from api_driver import api_driver
-from bot import BotState
-from utils import filter_helper, file_helper
+from api_drivers import google_sheet_driver
+from bot import BotState, dp
+from models import BadResponse
+from utils import file_helper, telegram_buttons_helper
+
+
+async def table_handler(message: types.Message, state: FSMContext) -> None:
+    await message.answer('Загрузите файлы', reply_markup=types.ReplyKeyboardRemove())
+    await state.set_state(BotState.upload_files)
 
 
 async def start_handler(message: types.Message, state: FSMContext) -> None:
+    await dp.bot.set_my_commands([
+        types.BotCommand('table', 'Начать работу бота'),
+        types.BotCommand('end', "Закончить работу бота"),
+    ])
+
     await message.answer('Загрузите файлы', reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(BotState.upload_files)
 
@@ -24,31 +35,27 @@ async def upload_files_handler(message: types.Message, files: list[types.Message
         return
 
     await file_helper.set_files_state(files, state)
-    filter_buttons_markup = await filter_helper.get_filter_buttons_markup([])
+    await message.answer('Получаем листы гугл таблицы')
+    resp = await google_sheet_driver.get_google_sheet_lists()
 
-    await message.answer('Выберите критерии подсчета дней:', reply_markup=filter_buttons_markup)
-    await BotState.select_filters.set()
-
-
-async def select_filters_handler(message: types.Message, state: FSMContext) -> None:
-    if await filter_helper.can_change_state(state, message.text):
-        await message.answer('Введите ссылку на Google Диск с итоговым файлом',
-                             reply_markup=types.ReplyKeyboardRemove())
-        await BotState.send_google_url.set()
-        return
-
-    selected_filters = await filter_helper.add_filter_to_state(state, message.text)
-    filter_buttons_markup = await filter_helper.get_filter_buttons_markup(selected_filters)
-
-    await message.answer('Выберите критерии подсчета дней:', reply_markup=filter_buttons_markup)
+    if type(resp) is BadResponse:
+        await message.answer(resp.text)
+    else:
+        await message.answer('Выберете нужный лист', reply_markup=types.ReplyKeyboardMarkup(keyboard=telegram_buttons_helper.get_buttons_by_list(resp.name_list)))
+        await BotState.select_lists.set()
 
 
-async def send_google_url_handler(message: types.Message, state: FSMContext) -> None:
+async def select_lists_handler(message: types.Message, state: FSMContext) -> None:
     data = await state.get_data()
-    url = message.values.get('text')
-    filters = data['filters']
     files = data['files']
-    await message.answer('бот начал работу')
-    resp = await api_driver.write_data_by_url(files=files, filters=filters, google_doc_url=url)
-    await message.answer('результат записан в файл')
+    list_name = message.text
+
+    await message.answer('Бот начал работу', reply_markup=types.ReplyKeyboardRemove())
+    response = await google_sheet_driver.update_google_sheets_table(list_name, files)
+
+    try:
+        await message.answer(response.text)
+    except Exception:
+        await message.answer('Результат записан в файл')
+
     await state.finish()
