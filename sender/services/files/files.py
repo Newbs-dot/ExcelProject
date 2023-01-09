@@ -28,8 +28,8 @@ class FileService:
 
         columns = sorted(columns)
 
-        data = google_doc.get_values('A:H')  # До 6 столбца
-        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'])
+        data = google_doc.get_values('A:B')
+        ws_df = pd.DataFrame(data, columns=['A','B'])
         first_entry = int(ws_df[ws_df['A'] == '1'].index[0] + 1)  # .index с нуля
         last_entry = int(ws_df.shape[0])
 
@@ -74,15 +74,15 @@ class FileService:
         return sorted_filters
 
     def count_days(self, google_doc, org_data, filters_dict):
-        data = google_doc.get_values('A:I')  # До 6 столбца !!!!!!!!! Доработать до многих столбцов
-        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'])
+        data = google_doc.get_values('A:C') # Столбцы фио
+        ws_df = pd.DataFrame(data, columns=['A', 'B', 'C'])
         ws_df.drop([0, 1], inplace=True)
         ws_df.drop(columns=['A'], inplace=True)
 
         filters = list(filters_dict.keys())
 
         absent_data = {}
-        result_values = np.zeros((len(filters), ws_df.shape[0]))  # тк удалены 2 строки
+        result_values = np.zeros((len(filters), ws_df.shape[0]))  # +2
 
         for filter in filters:
             absent_data[filter] = {}
