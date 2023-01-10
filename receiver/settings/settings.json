@@ -1,0 +1,5 @@
+{
+  "API_ROOT_URL": "http://sender:8000",
+  "API_PREFIX": "/api",
+  "TG_BOT_TOKEN": "..."
+}
