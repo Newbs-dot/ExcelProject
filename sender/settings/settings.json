@@ -1,0 +1,35 @@
+{
+  "API_HOST": "0.0.0.0",
+  "API_PORT": 8000,
+  "API_PROJECT_NAME": "bot-excel-api",
+  "API_PREFIX": "/api",
+  "API_GOOGLE_CREDS": {
+    "type": "...",
+    "project_id": "...",
+    "private_key_id": "...",
+    "private_key": "...",
+    "client_email": "...",
+    "client_id": "...",
+    "auth_uri": "...",
+    "token_uri": "...",
+    "auth_provider_x509_cert_url": "...",
+    "client_x509_cert_url": "..."
+  },
+  "API_CONFIG": {
+    "url": "https://docs.google.com/spreadsheets/...",
+    "filters": [
+      {
+        "filter": "Отпуск основной",
+        "column": "I"
+      },
+      {
+        "filter": "Болезнь",
+        "column": "F"
+      },
+      {
+        "filter": "Отпуск по уходу за ребенком",
+        "column": "G"
+      }
+    ]
+  }
+}
