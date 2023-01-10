@@ -3,7 +3,6 @@ from aiogram.dispatcher import FSMContext
 
 from api_drivers import google_sheet_driver
 from bot import BotState, dp
-from models import BadResponse
 from utils import file_helper, telegram_buttons_helper
 
 
@@ -38,9 +37,9 @@ async def upload_files_handler(message: types.Message, files: list[types.Message
     await message.answer('Получаем листы гугл таблицы')
     resp = await google_sheet_driver.get_google_sheet_lists()
 
-    if type(resp) is BadResponse:
+    try:
         await message.answer(resp.text)
-    else:
+    except Exception:
         await message.answer('Выберете нужный лист', reply_markup=types.ReplyKeyboardMarkup(keyboard=telegram_buttons_helper.get_buttons_by_list(resp.name_list)))
         await BotState.select_lists.set()
 
